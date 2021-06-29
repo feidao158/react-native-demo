@@ -1,14 +1,18 @@
-import { observable, action } from "mobx";
+import { observable, action,makeAutoObservable } from "mobx";
 
 class RootStore  {
 
-    @observable
-    name = "hello2"
-  
+    @observable name = "xxx";
+
     @action
-    changeName = (payload)=> {
+    changeName = payload => {
         this.name = payload
     }
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
 }
 
 export default new RootStore();

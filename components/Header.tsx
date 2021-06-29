@@ -2,14 +2,22 @@ import React, { Component } from "react";
 
 import { StyleSheet, Dimensions, Text, View, StatusBar, Image, TouchableOpacity, Button } from 'react-native'
 import { inject, observer } from "mobx-react";
-@inject("rootStore")
+// import { computed } from "mobx";
+@inject("RootStore")
 @observer
 class App extends Component<any, any> {
 
+    // @computed get name() {
+    //     return this.props.RootStore.name
+    // }
+
     changeName = () => {
-        console.log('realod..')
-        this.props.rootStore.changeName(Date.now())
-        console.log(this.props.rootStore.name)
+        this.props.RootStore.changeName(Date.now())
+        this.setState({
+            imageUrl: 'https://api.pingping6.com/api/acg3/index.api?time=' + this.props.RootStore.name
+        })
+
+        console.log(this.props.RootStore.name)
     }
 
     static defaultProps = {
@@ -31,7 +39,9 @@ class App extends Component<any, any> {
             imageInfo: {
                 width: Dimensions.get('window').width,
                 height: Dimensions.get('window').height-200,
-                resizeMode: 'contain'
+                resizeMode: 'contain',
+                loadingStatus: true,
+                display: 'flex'
             },
             imageUrl: 'https://api.pingping6.com/api/acg3/index.api?time=' + new Date().getTime(),
             loadingStatus: true,
@@ -41,9 +51,9 @@ class App extends Component<any, any> {
     }
 
     clickHandler = () => {
-        this.props.rootStore.changeName(Date.now())
+        this.props.RootStore.changeName(Date.now())
         this.setState({
-            imageUrl: 'https://api.pingping6.com/api/acg3/index.api?time=' + this.props.rootStore.name
+            imageUrl: 'https://api.pingping6.com/api/acg3/index.api?time=' + this.props.RootStore.name
         })
         console.log(this.state.imageUrl)
 
@@ -52,22 +62,38 @@ class App extends Component<any, any> {
 
     loadStartHandler = () => {
         this.setState({
-            loadingStatus: true
+            loadingStatus: true,
+            imageInfo: {
+                ...this.state.imageInfo,
+                display: 'none'
+            }
         })
         console.log('start loading...')
 
     }
 
+    loadEndHandler = ()=> {
+        this.setState({
+            loadingStatus: false,
+            imageInfo: {
+                ...this.state.imageInfo,
+                display: 'flex'
+            }
+        })
+        console.log('load end...')
+        console.log(this.state.loadingStatus)
+    }
+
+
 
     render() {
-        let {name} = this.props.rootStore
+       let {RootStore} = this.props
         return (
-
             <View style={styles.container}>
-                <TouchableOpacity onPress={this.clickHandler}>
-                    <Image onLoadStart={this.loadStartHandler} style={this.state.imageInfo} source={{ uri: this.state.imageUrl }} ></Image>
+                <TouchableOpacity onPress={this.changeName}>
+                    <Image onLoadStart={this.loadStartHandler} onLoadEnd={this.loadEndHandler}  style={this.state.imageInfo} source={{ uri: this.state.imageUrl }} ></Image>
                 </TouchableOpacity>
-                <Text onPress={this.changeName} style={styles.titleStyle}>{name}</Text>
+                <Text onPress={this.changeName} style={styles.titleStyle}>{RootStore.name}</Text>
                 <Text onPress={this.changeName}>change</Text>
 
             </View>
@@ -80,7 +106,6 @@ const styles = StyleSheet.create({
     container: {
         width: 400,
         backgroundColor: '#000',
-
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: StatusBar.currentHeight
