@@ -41,6 +41,7 @@ class App extends Component<any, any> {
     }
 
     clickHandler = () => {
+        this.props.rootStore.changeName(Date.now())
         this.setState({
             imageUrl: 'https://api.pingping6.com/api/acg3/index.api?time=' + this.props.rootStore.name
         })
@@ -60,11 +61,10 @@ class App extends Component<any, any> {
 
     render() {
         let {name} = this.props.rootStore
-      
         return (
 
             <View style={styles.container}>
-                <TouchableOpacity onPress={this.changeName}>
+                <TouchableOpacity onPress={this.clickHandler}>
                     <Image onLoadStart={this.loadStartHandler} style={this.state.imageInfo} source={{ uri: this.state.imageUrl }} ></Image>
                 </TouchableOpacity>
                 <Text onPress={this.changeName} style={styles.titleStyle}>{name}</Text>
